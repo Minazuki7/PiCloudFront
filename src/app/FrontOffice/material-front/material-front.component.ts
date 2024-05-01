@@ -2,6 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import { ScriptLoaderService } from '../../services/script-loader.service';
 import {MaterialService} from "../../services/material.service";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
+import { ReservationMService } from 'src/app/services/reservation-m.service';
 @Component({
   selector: 'app-material-front',
   templateUrl: './material-front.component.html',
@@ -15,7 +16,7 @@ export class MaterialFrontComponent implements OnInit{
   table2Data: any;
   form!: FormGroup;
   material:any;
-  constructor(private MaterialService: MaterialService, private scriptLoaderService: ScriptLoaderService,private formBuilder: FormBuilder) {
+  constructor(private MaterialService: MaterialService,private reservationMService: ReservationMService, private scriptLoaderService: ScriptLoaderService,private formBuilder: FormBuilder) {
   }
 
   ngOnInit(): void {
@@ -32,10 +33,13 @@ export class MaterialFrontComponent implements OnInit{
     ];
     this.loadScripts(scriptUrls);
     this.form = this.formBuilder.group({
-      name: [''],
-      description: [''],
-      image:['']
+      startTime: ['', Validators.required],
+      endTime: ['', Validators.required]
+    }, {
+      validators: this.timeValidator
     });
+  
+
 
     this.MaterialService.retrieveAll().subscribe(
       (data) => {
@@ -44,6 +48,17 @@ export class MaterialFrontComponent implements OnInit{
         console.log(this.table2Data[0].reservationMS);
 
       });
+  }
+
+  timeValidator(form: FormGroup) {
+    const startTime = form.get('startTime')?.value;
+    const endTime = form.get('endTime')?.value;
+
+    if (startTime && endTime && startTime >= endTime) {
+      form.get('endTime')?.setErrors({ 'invalidTime': true });
+    } else {
+      form.get('endTime')?.setErrors(null);
+    }
   }
 
   loadScripts(scriptUrls: string[]): void {
@@ -76,8 +91,28 @@ export class MaterialFrontComponent implements OnInit{
       });
   }
 
+  addReservation(): void {
+    const startTime = this.form.get('startTime')?.value;
+    const endTime = this.form.get('endTime')?.value;
+    const userId = 'currentUserId'; // Replace this with your logic to get the current user's ID
+  
+    const reservationData = {
+      startTime: startTime,
+      endTime: endTime,
+      userId: userId
+    };
+  
+    this.reservationMService.addReservationM(reservationData).subscribe(
+      (response) => {
+        console.log('Reservation added successfully:', response);
 
-
-}
+        this.form.reset();
+      },
+      (error) => {
+        console.error('Error adding reservation:', error);
+      }
+    );
+  }}
+  
 
 

@@ -51,7 +51,7 @@
           <th>Name</th>
           <th>Description</th>
           <th>Image</th>
-          <th>Action</th>
+          <th>Reservations</th>
 
           <!-- Add more columns as needed -->
         </tr>
@@ -70,7 +70,7 @@
               data-bs-toggle="modal"
               data-bs-target="#exampleModal"
             >
-              Reservations Request
+              View Reservations
             </button>
           </td>
           <!-- Display more columns as needed -->
@@ -100,14 +100,49 @@
         ></button>
       </div>
       <div class="modal-body">
-        <div class="table-responsive text-nowrap">
+        <form [formGroup]="form">
+          <div class="mb-3">
+            <label for="startTime" class="form-label">Start Time</label>
+            <input
+              formControlName="startTime"
+              class="form-control"
+              type="datetime-local"
+              id="startTime"
+              placeholder="Start Time"
+              required
+            />
+          </div>
+
+          <div class="mb-3">
+            <label for="endTime" class="form-label">End Time</label>
+            <input
+              formControlName="endTime"
+              class="form-control"
+              type="datetime-local"
+              id="endTime"
+              placeholder="End Time"
+              required
+            />
+            <div
+              *ngIf="
+                form.controls['endTime'].invalid &&
+                form.controls['endTime'].touched
+              "
+              class="text-danger"
+            >
+              End Time cannot be earlier than Start Time
+            </div>
+          </div>
+        </form>
+
+        <!-- <div class="table-responsive text-nowrap">
           <table class="table">
             <thead>
               <tr>
                 <th>Start Date</th>
                 <th>End Date</th>
                 <th>Status</th>
-                <!-- Add more columns as needed -->
+
               </tr>
             </thead>
             <tbody class="table-border-bottom-0">
@@ -115,17 +150,24 @@
                 <td>{{ row.date_debut }}</td>
                 <td>{{ row.date_fin }}</td>
                 <td>{{ row.etat }}</td>
-                <!-- Display more columns as needed -->
+
               </tr>
             </tbody>
           </table>
-        </div>
+        </div> -->
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
           Close
         </button>
-        <button type="button" class="btn btn-primary">Save changes</button>
+        <button
+          type="button"
+          class="btn btn-primary"
+          (click)="addReservation()"
+          data-bs-dismiss="modal"
+        >
+          Save changes
+        </button>
       </div>
     </div>
   </div>
