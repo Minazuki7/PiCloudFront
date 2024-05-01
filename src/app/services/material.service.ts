@@ -14,8 +14,8 @@ export class MaterialService {
   retrieveAll():Observable<Material[]>{
     return this.http.get<Material[]>("http://localhost:8080/findAllMaterials")
   }
-  addMaterial(data:any):Observable<any>{
-    return this.http.post("http://localhost:8080/addMaterial",data);
+    addMaterial(data: { fileName: string, pictureData: string, material: any }): Observable<any> {
+    return this.http.post("http://localhost:8080/addMaterial", data);
   }
   updateMaterial(data:any,idMaterial:any):Observable<any>{
     return this.http.put("http://localhost:8080/updateMaterial/"+idMaterial ,data);

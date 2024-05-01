@@ -1,25 +1,43 @@
-
-
-
-
-<button (click)="showMaterial=!showMaterial" type="button" class="btn btn-dark">{{ showMaterial }}</button>
+<button
+  (click)="showMaterial = !showMaterial"
+  type="button"
+  class="btn btn-dark"
+>
+  {{ showMaterial }}
+</button>
 <div *ngIf="!showMaterial">
   <!-- Form for adding a new Material -->
   <form [formGroup]="form">
     <div class="mb-3">
       <label for="NameMaterialInput" class="form-label">Name</label>
-      <input class="form-control" type="text" id="NameMaterialInput" placeholder="Name"/>
+      <input
+        class="form-control"
+        type="text"
+        id="NameMaterialInput"
+        placeholder="Name"
+      />
     </div>
     <div>
-      <label for="DescriptionMaterialInput" class="form-label">Description</label>
-      <textarea class="form-control" id="DescriptionMaterialInput" rows="3"></textarea>
+      <label for="DescriptionMaterialInput" class="form-label"
+        >Description</label
+      >
+      <textarea
+        class="form-control"
+        id="DescriptionMaterialInput"
+        rows="3"
+      ></textarea>
     </div>
     <div class="mb-3">
       <label for="formFile" class="form-label">Add Image</label>
-      <input class="form-control" type="file" id="formFile">
+      <input class="form-control" type="file" id="formFile" />
     </div>
-    <button (click)="addMaterial(form.value)" type="submit" class="btn btn-primary">Add</button>
-
+    <button
+      (click)="addMaterial(form.value)"
+      type="submit"
+      class="btn btn-primary"
+    >
+      Add
+    </button>
   </form>
 </div>
 
@@ -29,72 +47,84 @@
   <div class="table-responsive text-nowrap">
     <table class="table">
       <thead>
-      <tr>
-        <th>Name</th>
-        <th>Description </th>
-        <th>Image</th>
-        <th>Reservations</th>
+        <tr>
+          <th>Name</th>
+          <th>Description</th>
+          <th>Image</th>
+          <th>Action</th>
 
-        <!-- Add more columns as needed -->
-      </tr>
-
+          <!-- Add more columns as needed -->
+        </tr>
       </thead>
       <tbody class="table-border-bottom-0">
-      <tr *ngFor="let item of table2Data">
-        <td>{{ item.name }}</td>
-        <td>{{ item.description }}</td>
-        <td>{{ item.image }}</td>
-        <td>
-          <!-- Button trigger modal -->
-          <button (click)="showReservation(item)" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
-            View Reservations
-          </button>
-        </td>
-        <!-- Display more columns as needed -->
-      </tr>
+        <tr *ngFor="let item of table2Data">
+          <td>{{ item.name }}</td>
+          <td>{{ item.description }}</td>
+          <td><img src="{{ item.image }}" /></td>
+          <td>
+            <!-- Button trigger modal -->
+            <button
+              (click)="showReservation(item)"
+              type="button"
+              class="btn btn-primary"
+              data-bs-toggle="modal"
+              data-bs-target="#exampleModal"
+            >
+              Reservations Request
+            </button>
+          </td>
+          <!-- Display more columns as needed -->
+        </tr>
       </tbody>
     </table>
   </div>
 </div>
 
-
-
 <!-- Modal for view -->
-<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div
+  class="modal fade"
+  id="exampleModal"
+  tabindex="-1"
+  aria-labelledby="exampleModalLabel"
+  aria-hidden="true"
+>
   <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="exampleModalLabel">Related Reservations</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
-        </button>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
       </div>
       <div class="modal-body">
         <div class="table-responsive text-nowrap">
           <table class="table">
             <thead>
-            <tr>
-              <th>Start Date</th>
-              <th>End Date </th>
-              <th>Status</th>
-              <!-- Add more columns as needed -->
-            </tr>
-
+              <tr>
+                <th>Start Date</th>
+                <th>End Date</th>
+                <th>Status</th>
+                <!-- Add more columns as needed -->
+              </tr>
             </thead>
             <tbody class="table-border-bottom-0">
-            <tr *ngFor="let row of reservation">
-              <td>{{ row.date_debut }}</td>
-              <td>{{ row.date_fin }}</td>
-              <td>{{ row.etat }}</td>
-              <!-- Display more columns as needed -->
-            </tr>
+              <tr *ngFor="let row of reservation">
+                <td>{{ row.date_debut }}</td>
+                <td>{{ row.date_fin }}</td>
+                <td>{{ row.etat }}</td>
+                <!-- Display more columns as needed -->
+              </tr>
             </tbody>
           </table>
         </div>
-
-
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          Close
+        </button>
         <button type="button" class="btn btn-primary">Save changes</button>
       </div>
     </div>

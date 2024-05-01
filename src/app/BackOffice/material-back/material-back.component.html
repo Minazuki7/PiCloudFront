@@ -1,26 +1,50 @@
-
-
-
-
-<button (click)="showAddButton()" type="button" class="btn btn-dark">{{ addMaterialButton }}</button>
+<button (click)="toggleMaterialVisibility()" type="button" class="btn btn-dark">
+  {{ addMaterialButton }}
+</button>
 <div *ngIf="!showMaterial">
-<!-- Form for adding a new Material -->
-<form [formGroup]="form">
-  <div class="mb-3">
-  <label for="NameMaterialInput" class="form-label">Name</label>
-  <input class="form-control" type="text" id="NameMaterialInput" placeholder="Name"/>
-</div>
-<div>
-  <label for="DescriptionMaterialInput" class="form-label">Description</label>
-  <textarea class="form-control" id="DescriptionMaterialInput" rows="3"></textarea>
-</div>
-  <div class="mb-3">
-    <label for="formFile" class="form-label">Add Image</label>
-    <input class="form-control" type="file" id="formFile">
-  </div>
-  <button (click)="addMaterial(form.value)" type="submit" class="btn btn-primary">Add</button>
-
-</form>
+  <!-- Form for adding a new Material -->
+  <form [formGroup]="materialForm">
+    <div class="mb-3">
+      <label for="NameMaterialInput" class="form-label">Name</label>
+      <input
+        formControlName="name"
+        class="form-control"
+        type="text"
+        id="NameMaterialInput"
+        placeholder="Name"
+      />
+      <div
+        *ngIf="materialNameControl?.invalid && materialNameControl?.touched"
+        class="text-danger"
+      >
+        Name is required
+      </div>
+    </div>
+    <div>
+      <label for="DescriptionMaterialInput" class="form-label"
+        >Description</label
+      >
+      <textarea
+        formControlName="description"
+        class="form-control"
+        id="DescriptionMaterialInput"
+        rows="3"
+      ></textarea>
+    </div>
+    <div class="mb-3">
+      <label for="formFile" class="form-label">Add Image</label>
+      <input
+        (change)="fileSelected($event)"
+        formControlName="image"
+        class="form-control"
+        type="file"
+        id="formFile"
+      />
+    </div>
+    <button (click)="submit()" type="button" class="btn btn-primary">
+      {{ materialToEdit === 0 ? "Add" : "Edit" }}
+    </button>
+  </form>
 </div>
 
 <!-- MAIN TABLE -->
@@ -29,87 +53,121 @@
   <div class="table-responsive text-nowrap">
     <table class="table">
       <thead>
-      <tr>
-        <th>Name</th>
-        <th>Description </th>
-        <th>Image</th>
-        <th>Reservations</th>
-        <th>Edit Material</th>
-        <th>Delete Material</th>
-        <!-- Add more columns as needed -->
-      </tr>
-
+        <tr>
+          <th>Name</th>
+          <th>Description</th>
+          <th>Image</th>
+          <th>Reservations</th>
+          <th>Edit Material</th>
+          <th>Delete Material</th>
+          <!-- Add more columns as needed -->
+        </tr>
       </thead>
       <tbody class="table-border-bottom-0">
-      <tr *ngFor="let item of table2Data">
-        <td>{{ item.name }}</td>
-        <td>{{ item.description }}</td>
-        <td>{{ item.image }}</td>
-        <td>
-          <!-- Button trigger modal -->
-          <button (click)="showReservation(item)" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
-            View Reservations
-          </button>
-        </td>
+        <tr *ngFor="let item of table2Data">
+          <td>{{ item.name }}</td>
+          <td>{{ item.description }}</td>
+          <td><img src="{{ item.image }}" /></td>
+          <!-- <td>{{ item.image }}</td> -->
+          <td>
+            <!-- Button trigger modal -->
+            <button
+              (click)="showReservation(item)"
+              type="button"
+              class="btn btn-primary"
+              data-bs-toggle="modal"
+              data-bs-target="#exampleModal"
+            >
+              View Reservations
+            </button>
+          </td>
 
-        <td>
-          <!-- Button trigger modal -->
-          <button (click)="showReservation(item)" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editModal">
-            Edit Material
-          </button>
-        </td>
+          <td>
+            <!-- Button trigger modal -->
+            <button
+              (click)="toggleMaterialVisibility(item)"
+              type="button"
+              class="btn btn-primary"
+            >
+              Edit Material
+            </button>
+          </td>
 
-        <td>
-          <!-- Button trigger modal -->
-          <button (click)="material=item" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#deleteModal">
-            Delete Material
-          </button>
-        </td>
-        <!-- Display more columns as needed -->
-      </tr>
+          <td>
+            <!-- Button trigger modal -->
+            <button
+              (click)="material = item"
+              type="button"
+              class="btn btn-primary"
+              data-bs-toggle="modal"
+              data-bs-target="#deleteModal"
+            >
+              Delete Material
+            </button>
+          </td>
+          <!-- Display more columns as needed -->
+        </tr>
       </tbody>
     </table>
   </div>
 </div>
 
-
-
 <!-- Modal for view -->
-<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div
+  class="modal fade"
+  id="exampleModal"
+  tabindex="-1"
+  aria-labelledby="exampleModalLabel"
+  aria-hidden="true"
+>
   <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="exampleModalLabel">Related Reservations</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
-        </button>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
       </div>
       <div class="modal-body">
         <div class="table-responsive text-nowrap">
-        <table class="table">
-          <thead>
-          <tr>
-            <th>Start Date</th>
-            <th>End Date </th>
-            <th>Status</th>
-            <!-- Add more columns as needed -->
-          </tr>
-
-          </thead>
-          <tbody class="table-border-bottom-0">
-          <tr *ngFor="let row of reservation">
-            <td>{{ row.date_debut }}</td>
-            <td>{{ row.date_fin }}</td>
-            <td>{{ row.etat }}</td>
-            <!-- Display more columns as needed -->
-          </tr>
-          </tbody>
-        </table>
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Start Date</th>
+                <th>End Date</th>
+                <th>Status</th>
+                <th>Action</th>
+                <!-- Add more columns as needed -->
+              </tr>
+            </thead>
+            <tbody class="table-border-bottom-0">
+              <tr *ngFor="let row of reservation">
+                <td>{{ row.date_debut }}</td>
+                <td>{{ row.date_fin }}</td>
+                <td>{{ row.etat }}</td>
+                <td>
+                  <button
+                    type="button"
+                    class="btn btn-secondary"
+                    (click)="cancelReservation(row.idResM)"
+                    data-bs-dismiss="modal"
+                  >
+                    Cancel
+                  </button>
+                </td>
+                <!-- Display more columns as needed -->
+              </tr>
+            </tbody>
+          </table>
         </div>
-
-
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          Close
+        </button>
         <button type="button" class="btn btn-primary">Save changes</button>
       </div>
     </div>
@@ -118,21 +176,29 @@
 
 <!-- Modal for edit -->
 
-<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModal" aria-hidden="true">
+<div
+  class="modal fade"
+  id="editModal"
+  tabindex="-1"
+  aria-labelledby="editModal"
+  aria-hidden="true"
+>
   <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="editModalTitle">Related Reservations</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
-        </button>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
       </div>
-      <div class="modal-body">
-        I am edit
-
-
-      </div>
+      <div class="modal-body">I am edit</div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          Close
+        </button>
         <button type="button" class="btn btn-primary">Save changes</button>
       </div>
     </div>
@@ -141,22 +207,39 @@
 
 <!-- Modal for delete -->
 
-<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModal" aria-hidden="true">
+<div
+  class="modal fade"
+  id="deleteModal"
+  tabindex="-1"
+  aria-labelledby="deleteModal"
+  aria-hidden="true"
+>
   <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="deleteModalTitle">Related Reservations</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
-        </button>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
       </div>
       <div class="modal-body">
         Are you sure you want to delete this Material?
-
-
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button (click)="deleteMaterial(material)" type="button" class="btn btn-danger">Delele</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          Close
+        </button>
+        <button
+          data-bs-dismiss="modal"
+          (click)="deleteMaterial(material)"
+          type="button"
+          class="btn btn-danger"
+        >
+          Delele
+        </button>
       </div>
     </div>
   </div>
