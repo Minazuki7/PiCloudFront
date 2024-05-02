@@ -3,7 +3,7 @@ import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { ScriptLoaderService } from '../../services/script-loader.service';
 import { MaterialService } from "../../services/material.service";
 import {ReservationMService} from "../../services/reservation-m.service";
-
+import axios from 'axios';
 @Component({
   selector: 'app-material-back',
   templateUrl: './material-back.component.html',
@@ -104,47 +104,76 @@ export class MaterialBackComponent implements OnInit {
     return this.materialForm.get('name');
   }
 
+  
 
- addMaterial(): void {
-  if (this.materialForm.valid && this.file) {
-    const reader = new FileReader();
-    reader.onload = () => {
-      const fileData = reader.result?.toString().split(',')[1]; 
-      const randomChars = Math.random().toString(36).substring(2, 7);
-
-
-      const fileName =randomChars+ this.file?.name ;
-
-      const materialData = {
-        fileName: fileName,
-        pictureData: fileData  ||"", // Placeholder for pictureData, adjust if necessary
-        material: {
-          ...this.materialForm.value,
-          image: fileData // Set file data as base64 string
-        }
-      };
-
-      this.materialService.addMaterial(materialData).subscribe(
-        (data) => {
-          this.getData();
-          this.toggleMaterialVisibility(); 
-          this.materialForm.reset();
-          this.file = null; // Reset file after successful addition
-          this.fileName = ''; // Reset file name after successful addition
-        },
-        error => {
-          console.error('Failed to add material:', error);
-          // You can handle errors here, such as displaying an error message to the user.
-        }
-      );
-    };
-    reader.readAsDataURL(this.file); // Read file as data URL (base64)
-  } else {
-    console.error('Invalid form data or no file selected.');
-    // You can handle this case if necessary, e.g., display a message to the user.
+  uploadFile(file: File): Promise<string> {
+    return new Promise<string>((resolve, reject) => {
+      // Replace 'YOUR_UPLOAD_PRESET' and 'YOUR_CLOUD_NAME' with your Cloudinary credentials
+      const uploadPreset = 'ml_default';
+      const cloudName = 'dqfcnslya';
+  
+      // Prepare the data to be sent to Cloudinary
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('upload_preset', uploadPreset);
+  
+      // Make a POST request to Cloudinary's upload API
+      axios.post(`https://api.cloudinary.com/v1_1/${cloudName}/upload`, formData)
+        .then(response => {
+          // Cloudinary will return the URL of the uploaded file in the response
+          const imageUrl = response.data.secure_url;
+          resolve(imageUrl); // Resolve the promise with the URL
+        })
+        .catch(error => {
+          if (error.response) {
+            // The request was made and the server responded with a status code
+            console.error('Cloudinary error response:', error.response.data);
+            console.error('Status code:', error.response.status);
+          } else if (error.request) {
+            // The request was made but no response was received
+            console.error('No response received from Cloudinary:', error.request);
+          } else {
+            // Something else happened while setting up the request
+            console.error('Error setting up Cloudinary request:', error.message);
+          }
+          reject(error); // Reject the promise with the error
+        });
+    });
   }
-}
-
+  
+  addMaterial(): void {
+    if (this.materialForm.valid && this.file) {
+      // Upload the file to Cloudinary
+      this.uploadFile(this.file).then(imageUrl => {
+        // Prepare material data with form data and image URL
+        const materialData = {
+          ...this.materialForm.value, // Form data
+          image: imageUrl // Image URL from Cloudinary
+        };
+  
+        // Add material data to the API
+        this.materialService.addMaterial(materialData).subscribe(
+          (data) => {
+            // Handle successful addition
+            this.getData();
+            this.toggleMaterialVisibility(); 
+            this.materialForm.reset();
+            this.file = null; // Reset file after successful addition
+            this.fileName = ''; // Reset file name after successful addition
+          },
+          error => {
+            console.error('Failed to add material:', error);
+            // You can handle errors here, such as displaying an error message to the user.
+          }
+        );
+      }).catch(error => {
+        console.error('Failed to upload file:', error);
+      });
+    } else {
+      console.error('Invalid form data or no file selected.');
+      // You can handle this case if necessary, e.g., display a message to the user.
+    }
+  }
   
   
   
@@ -156,6 +185,7 @@ export class MaterialBackComponent implements OnInit {
       this.fileName = this.file.name;
     }
   }
+  
   
   
   editMateriel():void {
