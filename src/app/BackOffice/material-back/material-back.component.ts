@@ -10,7 +10,7 @@ import {ReservationMService} from "../../services/reservation-m.service";
   styleUrls: ['./material-back.component.scss'],
 })
 export class MaterialBackComponent implements OnInit {
-
+  searchTerm: string = '';
   reservation: any;
   showMaterial: boolean = true;
   table1Data: any;
@@ -47,16 +47,19 @@ export class MaterialBackComponent implements OnInit {
 
   }
 
-  getData (): void {
-
-    this.materialService.retrieveAll().subscribe(
-      (data) => {
-        this.table1Data = data;
-        this.table2Data = data;
-        
-        console.log(this.table2Data[0].reservationMS);
-      });
+  getData(): void {
+    this.materialService.retrieveAll().subscribe((data) => {
+      this.table1Data = data.filter((item: any) =>
+        item.name.toLowerCase().includes(this.searchTerm.toLowerCase())
+      );
+      this.table2Data = this.table1Data;
+    });
   }
+  updateSearchTerm(event: any): void {
+    this.searchTerm = event.target.value;
+    this.getData();
+  }
+
   toggleMaterialVisibility(item?:any): void {
     this.showMaterial = !this.showMaterial;
     this.addMaterialButton = this.showMaterial ? "Add a material" : "View Material list";

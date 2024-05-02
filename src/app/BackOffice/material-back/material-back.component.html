@@ -1,6 +1,13 @@
 <button (click)="toggleMaterialVisibility()" type="button" class="btn btn-dark">
   {{ addMaterialButton }}
 </button>
+<input
+  class="form-control search"
+  type="text"
+  (input)="updateSearchTerm($event)"
+  placeholder="Search by name"
+/>
+
 <div *ngIf="!showMaterial">
   <!-- Form for adding a new Material -->
   <form [formGroup]="materialForm">
@@ -64,7 +71,7 @@
         </tr>
       </thead>
       <tbody class="table-border-bottom-0">
-        <tr *ngFor="let item of table2Data">
+        <tr *ngFor="let item of table1Data">
           <td>{{ item.name }}</td>
           <td>{{ item.description }}</td>
           <td><img src="{{ item.image }}" /></td>
